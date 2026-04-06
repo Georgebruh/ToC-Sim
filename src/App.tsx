@@ -4,20 +4,30 @@ export default function App() {
   // --- State Hooks ---
   const [isExplainActive, setIsExplainActive] = useState(false);
   const [isGenerateActive, setIsGenerateActive] = useState(false);
+  const [isDebugActive, setIsDebugActive] = useState(false);
 
-  // --- Event Handlers ---
+  // --- Event Handlers (Mutually Exclusive) ---
   const handleExplainClick = () => {
     setIsExplainActive(!isExplainActive);
-    setIsGenerateActive(false); // Close generate if explain is opened
+    setIsGenerateActive(false);
+    setIsDebugActive(false);
   };
 
   const handleGenerateClick = () => {
     setIsGenerateActive(!isGenerateActive);
-    setIsExplainActive(false); // Close explain if generate is opened
+    setIsExplainActive(false);
+    setIsDebugActive(false);
+  };
+
+  const handleDebugClick = () => {
+    setIsDebugActive(!isDebugActive);
+    setIsExplainActive(false);
+    setIsGenerateActive(false);
   };
 
   return (
-    <div className="h-screen w-screen bg-background text-on-surface font-['Space_Grotesk'] overflow-hidden flex flex-col selection:bg-primary-container selection:text-on-primary-container">
+    <div className="h-screen w-screen bg-background text-on-surface font-['Space_Grotesk'] overflow-hidden flex flex-col selection:bg-primary-container selection:text-on-primary-container relative">
+      
       {/* Top Navigation */}
       <header className="w-full h-14 bg-surface-container flex justify-between items-center px-6 shrink-0 relative z-50 shadow-md">
         <div className="flex items-center gap-8">
@@ -36,6 +46,7 @@ export default function App() {
 
       {/* Main Layout */}
       <div className="flex-1 flex overflow-hidden">
+        
         {/* Left Semantic Shell */}
         <aside className="w-20 bg-surface-container-low flex flex-col items-center py-8 space-y-8 z-40 shrink-0 shadow-[4px_0_24px_rgba(0,0,0,0.2)]">
           {/* EXPLAIN BUTTON */}
@@ -78,9 +89,22 @@ export default function App() {
           </div>
 
           {/* DEBUG BUTTON */}
-          <div className="flex flex-col items-center gap-1 group cursor-pointer">
-            <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-transform scale-95 active:scale-90">bug_report</span>
-            <span className="uppercase text-[10px] tracking-widest text-on-surface-variant group-hover:text-primary mt-1">Debug</span>
+          <div 
+            onClick={handleDebugClick}
+            className="flex flex-col items-center gap-1 group cursor-pointer"
+          >
+            <span 
+              className={`material-symbols-outlined transition-transform scale-95 active:scale-90 ${
+                isDebugActive 
+                  ? 'text-primary drop-shadow-[0_0_8px_rgba(186,158,255,0.5)]' 
+                  : 'text-on-surface-variant group-hover:text-primary group-hover:scale-100'
+              }`}
+            >
+              bug_report
+            </span>
+            <span className={`uppercase text-[10px] tracking-widest mt-1 transition-colors ${isDebugActive ? 'text-primary' : 'text-on-surface-variant group-hover:text-primary'}`}>
+              Debug
+            </span>
           </div>
         </aside>
 
@@ -105,52 +129,27 @@ export default function App() {
             </div>
           </div>
 
-          {/* GENERATE UI COMMAND PALETTE */}
+          {/* GENERATE COMMAND PALETTE (Conditional) */}
           {isGenerateActive && (
             <div className="absolute top-16 left-1/2 -translate-x-1/2 w-[600px] z-50 flex flex-col bg-surface shadow-[0_40px_80px_rgba(0,0,0,0.8)] rounded-xl overflow-hidden pointer-events-auto">
-              
-              {/* Header */}
               <div className="px-5 py-3 bg-surface-container-low flex items-center gap-3">
                 <span className="material-symbols-outlined text-primary text-lg">auto_awesome</span>
                 <span className="text-xs font-bold uppercase tracking-widest text-on-surface">Gemini Automata Builder</span>
-                <button 
-                  onClick={() => setIsGenerateActive(false)}
-                  className="ml-auto text-[10px] text-on-surface-variant font-mono bg-surface-container-high hover:bg-surface-container-highest transition-colors px-2 py-1 rounded cursor-pointer"
-                >
-                  ESC
-                </button>
+                <button onClick={() => setIsGenerateActive(false)} className="ml-auto text-[10px] text-on-surface-variant font-mono bg-surface-container-high hover:bg-surface-container-highest transition-colors px-2 py-1 rounded cursor-pointer">ESC</button>
               </div>
-
-              {/* IDE Style Input Rule */}
               <div className="flex flex-col relative bg-surface-container">
-                <input
-                  autoFocus
-                  onKeyDown={(e) => { if (e.key === 'Escape') setIsGenerateActive(false); }}
-                  className="w-full bg-surface-container-low px-6 py-6 text-secondary font-mono text-sm outline-none focus:bg-surface-container-high transition-all border-b-2 border-transparent focus:border-secondary placeholder:text-on-surface-variant/50"
-                  placeholder="e.g., 'Generate a DFA that accepts binary strings ending in 01'..."
-                  type="text"
-                />
+                <input autoFocus onKeyDown={(e) => { if (e.key === 'Escape') setIsGenerateActive(false); }} className="w-full bg-surface-container-low px-6 py-6 text-secondary font-mono text-sm outline-none focus:bg-surface-container-high transition-all border-b-2 border-transparent focus:border-secondary placeholder:text-on-surface-variant/50" placeholder="e.g., 'Generate a DFA that accepts binary strings ending in 01'..." type="text" />
               </div>
-
-              {/* Suggestions (Cards & Lists Rule: 4px gap, hover shifts) */}
               <div className="p-4 bg-surface flex flex-col gap-1">
                 <p className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-2 px-2">Example Prompts</p>
-
                 <div className="px-4 py-3 rounded bg-surface-container hover:bg-surface-container-high transition-colors cursor-pointer flex items-center gap-4 group">
                   <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary text-sm transition-colors">edit_note</span>
                   <span className="text-xs text-on-surface font-mono">DFA for an even number of 0s and 1s</span>
                   <span className="material-symbols-outlined ml-auto text-on-surface-variant opacity-0 group-hover:opacity-100 group-hover:text-secondary text-sm transition-all">arrow_forward</span>
                 </div>
-
                 <div className="px-4 py-3 rounded bg-surface-container hover:bg-surface-container-high transition-colors cursor-pointer flex items-center gap-4 group">
                   <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary text-sm transition-colors">edit_note</span>
                   <span className="text-xs text-on-surface font-mono">NFA that accepts the language (a|b)*abb</span>
-                  <span className="material-symbols-outlined ml-auto text-on-surface-variant opacity-0 group-hover:opacity-100 group-hover:text-secondary text-sm transition-all">arrow_forward</span>
-                </div>
-                
-                <div className="px-4 py-3 rounded bg-surface-container hover:bg-surface-container-high transition-colors cursor-pointer flex items-center gap-4 group">
-                  <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary text-sm transition-colors">edit_note</span>
-                  <span className="text-xs text-on-surface font-mono">DFA accepting binary strings divisible by 3</span>
                   <span className="material-symbols-outlined ml-auto text-on-surface-variant opacity-0 group-hover:opacity-100 group-hover:text-secondary text-sm transition-all">arrow_forward</span>
                 </div>
               </div>
@@ -163,9 +162,9 @@ export default function App() {
               <path d="M 300 400 L 500 400" fill="none" stroke="#48474b" strokeWidth="2"></path>
               <polygon fill="#48474b" points="500,400 490,395 490,405"></polygon>
               <text fill="#acaaae" fontFamily="Space Grotesk" fontSize="12" x="385" y="390">1</text>
-              <path d="M 500 400 Q 600 300 700 400" fill="none" stroke="#00f4fe" strokeDasharray="4" strokeWidth="2"></path>
-              <polygon fill="#00f4fe" points="700,400 690,392 694,402"></polygon>
-              <text fill="#00f4fe" fontFamily="Space Grotesk" fontSize="12" x="590" y="330">0</text>
+              <path d="M 500 400 Q 600 300 700 400" fill="none" stroke={isDebugActive ? "#ff6e84" : "#00f4fe"} strokeDasharray="4" strokeWidth="2"></path>
+              <polygon fill={isDebugActive ? "#ff6e84" : "#00f4fe"} points="700,400 690,392 694,402"></polygon>
+              <text fill={isDebugActive ? "#ff6e84" : "#00f4fe"} fontFamily="Space Grotesk" fontSize="12" x="590" y="330">0, 1</text>
             </svg>
 
             <div className="absolute left-[260px] top-[360px] w-20 h-20 bg-surface-container shadow-md rounded-full flex flex-col items-center justify-center">
@@ -173,9 +172,9 @@ export default function App() {
               <span className="text-[10px] text-on-surface-variant uppercase tracking-widest">Initial</span>
             </div>
 
-            <div className="absolute left-[460px] top-[360px] w-20 h-20 bg-surface-container shadow-md rounded-full flex flex-col items-center justify-center node-glow ring-2 ring-secondary ring-offset-4 ring-offset-surface">
-              <span className="text-secondary font-bold">q₁</span>
-              <span className="text-[10px] text-secondary/70 uppercase tracking-widest">Active</span>
+            <div className={`absolute left-[460px] top-[360px] w-20 h-20 bg-surface-container shadow-md rounded-full flex flex-col items-center justify-center ring-2 ring-offset-4 ring-offset-surface ${isDebugActive ? 'ring-error node-glow-error' : 'ring-secondary node-glow'}`}>
+              <span className={`font-bold ${isDebugActive ? 'text-error' : 'text-secondary'}`}>q₁</span>
+              <span className={`text-[10px] uppercase tracking-widest ${isDebugActive ? 'text-error/70' : 'text-secondary/70'}`}>{isDebugActive ? 'Halted' : 'Active'}</span>
             </div>
 
             <div className="absolute left-[660px] top-[360px] w-20 h-20 bg-surface-container shadow-md rounded-full flex items-center justify-center">
@@ -188,8 +187,8 @@ export default function App() {
           {/* Graph Status Overlay */}
           <div className="absolute bottom-24 left-6 bg-surface-container-low/80 backdrop-blur-md px-4 py-2 rounded-lg flex items-center gap-4 shadow-lg">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-secondary animate-pulse"></div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface">Live Engine</span>
+              <div className={`w-2 h-2 rounded-full animate-pulse ${isDebugActive ? 'bg-error' : 'bg-secondary'}`}></div>
+              <span className={`text-[10px] font-bold uppercase tracking-widest ${isDebugActive ? 'text-error' : 'text-on-surface'}`}>{isDebugActive ? 'Engine Halted' : 'Live Engine'}</span>
             </div>
             <div className="h-4 w-px bg-surface-container-highest"></div>
             <span className="text-[10px] text-on-surface-variant uppercase tracking-widest">States: 4</span>
@@ -204,12 +203,20 @@ export default function App() {
               <h2 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Logic Inspector</h2>
               <span className="material-symbols-outlined text-on-surface-variant text-sm cursor-pointer hover:text-on-surface transition-colors">settings</span>
             </div>
-            <div className="bg-secondary/10 p-4 rounded-xl shadow-inner transition-colors">
+            
+            {/* Dynamic Status Box */}
+            <div className={`p-4 rounded-xl shadow-inner transition-colors ${isDebugActive ? 'bg-error/10' : 'bg-secondary/10'}`}>
               <div className="flex items-center gap-2 mb-1">
-                <span className="material-symbols-outlined text-secondary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                <span className="text-secondary font-bold text-sm tracking-tight uppercase">Accepted</span>
+                <span className={`material-symbols-outlined text-sm ${isDebugActive ? 'text-error' : 'text-secondary'}`} style={{ fontVariationSettings: "'FILL' 1" }}>
+                  {isDebugActive ? 'warning' : 'check_circle'}
+                </span>
+                <span className={`font-bold text-sm tracking-tight uppercase ${isDebugActive ? 'text-error' : 'text-secondary'}`}>
+                  {isDebugActive ? 'Syntax Error' : 'Accepted'}
+                </span>
               </div>
-              <p className="text-[11px] text-on-surface-variant mt-1">String matched grammar <span className="text-secondary font-mono">L(M₁)</span></p>
+              <p className="text-[11px] text-on-surface-variant mt-1">
+                {isDebugActive ? 'Non-deterministic transition detected.' : 'String matched grammar '}<span className={`${isDebugActive ? 'text-error' : 'text-secondary'} font-mono`}>{!isDebugActive && 'L(M₁)'}</span>
+              </p>
             </div>
           </div>
 
@@ -251,15 +258,33 @@ export default function App() {
               <span className="text-on-surface-variant">→</span>
               <span className="text-primary">q₁</span>
             </div>
-            <div className="hover:bg-surface-container-high p-2 -mx-2 rounded transition-colors flex items-center gap-2 bg-surface-container-high/30">
-              <span className="text-on-surface-variant">Step 3:</span>
-              <span className="text-primary">q₁</span> 
-              <span className="text-on-surface-variant">→</span>
-              <span className="text-on-surface">0</span>
-              <span className="text-on-surface-variant">→</span>
-              <span className="text-secondary font-bold">q₂</span>
-            </div>
-            <p className="text-secondary mt-4 font-bold uppercase tracking-wider text-[10px]">Terminating at q₂ (ACCEPTING)</p>
+            
+            {/* Dynamic Final Step */}
+            {!isDebugActive ? (
+              <>
+                <div className="hover:bg-surface-container-high p-2 -mx-2 rounded transition-colors flex items-center gap-2 bg-surface-container-high/30">
+                  <span className="text-on-surface-variant">Step 3:</span>
+                  <span className="text-primary">q₁</span> 
+                  <span className="text-on-surface-variant">→</span>
+                  <span className="text-on-surface">0</span>
+                  <span className="text-on-surface-variant">→</span>
+                  <span className="text-secondary font-bold">q₂</span>
+                </div>
+                <p className="text-secondary mt-4 font-bold uppercase tracking-wider text-[10px]">Terminating at q₂ (ACCEPTING)</p>
+              </>
+            ) : (
+               <>
+                <div className="hover:bg-error/10 p-2 -mx-2 rounded transition-colors flex items-center gap-2 bg-error/5 border-l-2 border-error">
+                  <span className="text-error font-bold">Step 3:</span>
+                  <span className="text-primary">q₁</span> 
+                  <span className="text-error">→</span>
+                  <span className="text-error font-bold line-through">1</span>
+                  <span className="text-error">→</span>
+                  <span className="text-error font-bold">???</span>
+                </div>
+                <p className="text-error mt-4 font-bold uppercase tracking-wider text-[10px]">Engine Halted (AMBIGUITY)</p>
+              </>
+            )}
           </div>
 
           <div className="p-6 mt-auto bg-surface-container flex flex-col gap-4">
@@ -269,7 +294,7 @@ export default function App() {
             </div>
             <div className="flex gap-2">
               <div className="h-1.5 flex-grow bg-surface-container-highest rounded-full overflow-hidden shadow-inner">
-                <div className="h-full w-2/3 bg-secondary"></div>
+                <div className={`h-full w-2/3 ${isDebugActive ? 'bg-error' : 'bg-secondary'}`}></div>
               </div>
               <div className="h-1.5 flex-grow bg-surface-container-highest rounded-full overflow-hidden shadow-inner">
                 <div className="h-full w-1/2 bg-primary"></div>
@@ -280,7 +305,7 @@ export default function App() {
       </div>
 
       {/* BottomNavBar */}
-      <footer className="fixed bottom-0 left-0 right-0 h-16 flex justify-center items-center gap-10 z-50 bg-surface-container/85 backdrop-blur-xl rounded-t-2xl shadow-[0_-10px_40px_rgba(0,0,0,0.6)] font-['Space_Grotesk'] font-medium">
+      <footer className="fixed bottom-0 left-0 right-0 h-16 flex justify-center items-center gap-10 z-40 bg-surface-container/85 backdrop-blur-xl rounded-t-2xl shadow-[0_-10px_40px_rgba(0,0,0,0.6)] font-['Space_Grotesk'] font-medium">
         <div className="flex flex-col items-center text-on-surface-variant hover:scale-110 transition-transform cursor-pointer active:scale-90 hover:text-on-surface">
           <span className="material-symbols-outlined">play_arrow</span>
           <span className="text-[10px] uppercase tracking-widest mt-1">Play</span>
@@ -298,6 +323,29 @@ export default function App() {
           <span className="text-[10px] uppercase tracking-widest mt-1">Step Forward</span>
         </div>
       </footer>
+
+      {/* TOAST NOTIFICATION (Logic Debugger) */}
+      {isDebugActive && (
+        <div className="fixed bottom-24 right-6 z-[100] transition-all duration-300 transform translate-x-0">
+          <div className="bg-surface-container-highest border-l-4 border-error p-4 shadow-2xl flex items-start gap-4 max-w-sm rounded-r-lg">
+            <div className="bg-error/20 p-2 rounded">
+              <span className="material-symbols-outlined text-error" style={{ fontVariationSettings: "'FILL' 1" }}>warning</span>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-error font-bold text-sm tracking-tight mb-1 uppercase">Non-Deterministic Transition</h3>
+              <p className="text-on-surface-variant text-xs leading-relaxed">
+                State <span className="font-mono text-primary">q₁</span> has multiple outgoing transitions for input <span className="font-mono text-on-surface">'1'</span>. Engine halted.
+              </p>
+            </div>
+            <button 
+              onClick={() => setIsDebugActive(false)}
+              className="text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-sm">close</span>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
