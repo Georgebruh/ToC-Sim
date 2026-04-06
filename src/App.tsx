@@ -3,12 +3,17 @@ import React, { useState } from 'react';
 export default function App() {
   // --- State Hooks ---
   const [isExplainActive, setIsExplainActive] = useState(false);
+  const [isGenerateActive, setIsGenerateActive] = useState(false);
 
   // --- Event Handlers ---
   const handleExplainClick = () => {
     setIsExplainActive(!isExplainActive);
-    // Future AI Tutor logic will be fired from here
-    console.log(`Explain mode toggled: ${!isExplainActive ? 'ON' : 'OFF'}`);
+    setIsGenerateActive(false); // Close generate if explain is opened
+  };
+
+  const handleGenerateClick = () => {
+    setIsGenerateActive(!isGenerateActive);
+    setIsExplainActive(false); // Close explain if generate is opened
   };
 
   return (
@@ -29,11 +34,11 @@ export default function App() {
         </div>
       </header>
 
-      {/* Main Layout (No Divider Lines - Tonal Shifts Only) */}
+      {/* Main Layout */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Semantic Shell */}
         <aside className="w-20 bg-surface-container-low flex flex-col items-center py-8 space-y-8 z-40 shrink-0 shadow-[4px_0_24px_rgba(0,0,0,0.2)]">
-          {/* EXPLAIN BUTTON: Now wired with state and click handler */}
+          {/* EXPLAIN BUTTON */}
           <div 
             onClick={handleExplainClick}
             className="flex flex-col items-center gap-1 group cursor-pointer"
@@ -48,29 +53,40 @@ export default function App() {
             >
               psychology
             </span>
-            <span 
-              className={`uppercase text-[10px] tracking-widest mt-1 transition-colors ${
-                isExplainActive 
-                  ? 'text-primary' 
-                  : 'text-secondary'
-              }`}
-            >
+            <span className={`uppercase text-[10px] tracking-widest mt-1 transition-colors ${isExplainActive ? 'text-primary' : 'text-secondary'}`}>
               Explain
             </span>
           </div>
 
-          <div className="flex flex-col items-center gap-1 group cursor-pointer">
-            <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-transform scale-95 active:scale-90">auto_awesome</span>
-            <span className="uppercase text-[10px] tracking-widest text-on-surface-variant group-hover:text-primary mt-1">Generate</span>
+          {/* GENERATE BUTTON */}
+          <div 
+            onClick={handleGenerateClick}
+            className="flex flex-col items-center gap-1 group cursor-pointer"
+          >
+            <span 
+              className={`material-symbols-outlined transition-transform scale-95 active:scale-90 ${
+                isGenerateActive 
+                  ? 'text-primary drop-shadow-[0_0_8px_rgba(186,158,255,0.5)]' 
+                  : 'text-on-surface-variant group-hover:text-primary group-hover:scale-100'
+              }`}
+            >
+              auto_awesome
+            </span>
+            <span className={`uppercase text-[10px] tracking-widest mt-1 transition-colors ${isGenerateActive ? 'text-primary' : 'text-on-surface-variant group-hover:text-primary'}`}>
+              Generate
+            </span>
           </div>
+
+          {/* DEBUG BUTTON */}
           <div className="flex flex-col items-center gap-1 group cursor-pointer">
             <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-transform scale-95 active:scale-90">bug_report</span>
             <span className="uppercase text-[10px] tracking-widest text-on-surface-variant group-hover:text-primary mt-1">Debug</span>
           </div>
         </aside>
 
-        {/* Central Canvas (Main Stage) */}
+        {/* Central Canvas */}
         <main className="flex-1 relative canvas-grid bg-surface overflow-hidden">
+          
           {/* Canvas Toolbar */}
           <div className="absolute top-6 left-6 flex flex-col gap-2 z-10">
             <div className="bg-surface-container-low/80 backdrop-blur-md p-1.5 rounded-lg flex flex-col gap-1 shadow-lg">
@@ -89,8 +105,60 @@ export default function App() {
             </div>
           </div>
 
-          {/* Simulated Graph Layer */}
-          <div className="w-full h-full relative">
+          {/* GENERATE UI COMMAND PALETTE */}
+          {isGenerateActive && (
+            <div className="absolute top-16 left-1/2 -translate-x-1/2 w-[600px] z-50 flex flex-col bg-surface shadow-[0_40px_80px_rgba(0,0,0,0.8)] rounded-xl overflow-hidden pointer-events-auto">
+              
+              {/* Header */}
+              <div className="px-5 py-3 bg-surface-container-low flex items-center gap-3">
+                <span className="material-symbols-outlined text-primary text-lg">auto_awesome</span>
+                <span className="text-xs font-bold uppercase tracking-widest text-on-surface">Gemini Automata Builder</span>
+                <button 
+                  onClick={() => setIsGenerateActive(false)}
+                  className="ml-auto text-[10px] text-on-surface-variant font-mono bg-surface-container-high hover:bg-surface-container-highest transition-colors px-2 py-1 rounded cursor-pointer"
+                >
+                  ESC
+                </button>
+              </div>
+
+              {/* IDE Style Input Rule */}
+              <div className="flex flex-col relative bg-surface-container">
+                <input
+                  autoFocus
+                  onKeyDown={(e) => { if (e.key === 'Escape') setIsGenerateActive(false); }}
+                  className="w-full bg-surface-container-low px-6 py-6 text-secondary font-mono text-sm outline-none focus:bg-surface-container-high transition-all border-b-2 border-transparent focus:border-secondary placeholder:text-on-surface-variant/50"
+                  placeholder="e.g., 'Generate a DFA that accepts binary strings ending in 01'..."
+                  type="text"
+                />
+              </div>
+
+              {/* Suggestions (Cards & Lists Rule: 4px gap, hover shifts) */}
+              <div className="p-4 bg-surface flex flex-col gap-1">
+                <p className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-2 px-2">Example Prompts</p>
+
+                <div className="px-4 py-3 rounded bg-surface-container hover:bg-surface-container-high transition-colors cursor-pointer flex items-center gap-4 group">
+                  <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary text-sm transition-colors">edit_note</span>
+                  <span className="text-xs text-on-surface font-mono">DFA for an even number of 0s and 1s</span>
+                  <span className="material-symbols-outlined ml-auto text-on-surface-variant opacity-0 group-hover:opacity-100 group-hover:text-secondary text-sm transition-all">arrow_forward</span>
+                </div>
+
+                <div className="px-4 py-3 rounded bg-surface-container hover:bg-surface-container-high transition-colors cursor-pointer flex items-center gap-4 group">
+                  <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary text-sm transition-colors">edit_note</span>
+                  <span className="text-xs text-on-surface font-mono">NFA that accepts the language (a|b)*abb</span>
+                  <span className="material-symbols-outlined ml-auto text-on-surface-variant opacity-0 group-hover:opacity-100 group-hover:text-secondary text-sm transition-all">arrow_forward</span>
+                </div>
+                
+                <div className="px-4 py-3 rounded bg-surface-container hover:bg-surface-container-high transition-colors cursor-pointer flex items-center gap-4 group">
+                  <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary text-sm transition-colors">edit_note</span>
+                  <span className="text-xs text-on-surface font-mono">DFA accepting binary strings divisible by 3</span>
+                  <span className="material-symbols-outlined ml-auto text-on-surface-variant opacity-0 group-hover:opacity-100 group-hover:text-secondary text-sm transition-all">arrow_forward</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Graph Nodes */}
+          <div className={`w-full h-full relative transition-opacity duration-300 ${isGenerateActive ? 'opacity-30' : 'opacity-100'}`}>
             <svg className="absolute inset-0 w-full h-full pointer-events-none">
               <path d="M 300 400 L 500 400" fill="none" stroke="#48474b" strokeWidth="2"></path>
               <polygon fill="#48474b" points="500,400 490,395 490,405"></polygon>
@@ -100,7 +168,6 @@ export default function App() {
               <text fill="#00f4fe" fontFamily="Space Grotesk" fontSize="12" x="590" y="330">0</text>
             </svg>
 
-            {/* Nodes */}
             <div className="absolute left-[260px] top-[360px] w-20 h-20 bg-surface-container shadow-md rounded-full flex flex-col items-center justify-center">
               <span className="text-on-surface font-bold">q₀</span>
               <span className="text-[10px] text-on-surface-variant uppercase tracking-widest">Initial</span>
@@ -130,9 +197,8 @@ export default function App() {
           </div>
         </main>
 
-        {/* Right Sidebar - Simulation Panel (Sunken Layout) */}
+        {/* Right Sidebar - Simulation Panel */}
         <aside className="w-80 bg-surface-container-low flex flex-col h-full overflow-y-auto shrink-0 shadow-[-4px_0_24px_rgba(0,0,0,0.2)] z-30 pb-20">
-          {/* Panel Header */}
           <div className="p-6 bg-surface-container shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Logic Inspector</h2>
@@ -147,7 +213,6 @@ export default function App() {
             </div>
           </div>
 
-          {/* Input Controls (IDE Style) */}
           <div className="p-6 flex flex-col gap-8">
             <div className="flex flex-col gap-2 relative">
               <label className="text-[10px] uppercase tracking-widest text-on-surface-variant">Input String</label>
@@ -168,7 +233,6 @@ export default function App() {
             </div>
           </div>
 
-          {/* Execution Logs */}
           <div className="flex-grow bg-surface mx-6 mb-6 rounded-xl p-5 font-mono text-[11px] flex flex-col gap-1 shadow-inner overflow-y-auto">
             <p className="text-on-surface-variant mb-4 font-sans uppercase tracking-widest text-[10px]">Executing path trace...</p>
             <div className="hover:bg-surface-container-high p-2 -mx-2 rounded transition-colors flex items-center gap-2">
@@ -198,7 +262,6 @@ export default function App() {
             <p className="text-secondary mt-4 font-bold uppercase tracking-wider text-[10px]">Terminating at q₂ (ACCEPTING)</p>
           </div>
 
-          {/* Metadata Bento Mini */}
           <div className="p-6 mt-auto bg-surface-container flex flex-col gap-4">
             <div className="flex justify-between items-center">
               <span className="text-[10px] text-on-surface-variant uppercase tracking-widest">Compiler</span>
