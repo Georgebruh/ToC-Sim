@@ -1,4 +1,4 @@
-# TOC Sim 🧠⚡
+# TOC Sim 
 
 **An Interactive, AI-Powered Theory of Computation Simulator.**
 
@@ -6,13 +6,10 @@ TOC Sim is a web application designed to help Computer Science students visualiz
 
 ---
 
-## ✨ Features
+# Features
 
 * **Interactive Canvas:** Draw states and transitions seamlessly using a drag-and-drop node-based interface.
 * **Real-Time Simulation:** Test strings against your custom automata with step-by-step visual playback. Watch the machine traverse states in real-time.
 * **AI Tutor Integration:** Powered by Google Gemini, the built-in AI tutor can explain the language accepted by your machine, generate complete automata structures from natural language prompts, and debug rejected strings.
 * **Instant Feedback:** Clear visual indicators for accepted/rejected states and validation errors for invalid DFA configurations.
 
-run:
-npm install -D tailwindcss@3 postcss autoprefixer
-npx tailwindcss init -p
