@@ -26,20 +26,16 @@ export default function App() {
   } = useSimulationState();
 
   const sim = useSimulation();
+  const { setAutomaton, reset: resetSim } = sim;
   const canvasHandleRef = useRef<CanvasHandle>(null);
   const [showMultiRun, setShowMultiRun] = useState(false);
-
-  const handleAutomatonChange = useCallback(
-    (next: Automaton) => sim.setAutomaton(next),
-    [sim],
-  );
 
   const handleGenerate = useCallback(
     (automaton: Automaton, layout: Record<string, { x: number; y: number }>) => {
       canvasHandleRef.current?.loadAutomaton(automaton, layout);
-      sim.reset();
+      resetSim();
     },
-    [sim],
+    [resetSim],
   );
 
   const canStepBack = sim.stepIndex > 0;
@@ -63,7 +59,7 @@ export default function App() {
           <Canvas
             handleRef={canvasHandleRef}
             activeStateIds={sim.activeStateIds}
-            onAutomatonChange={handleAutomatonChange}
+            onAutomatonChange={setAutomaton}
           />
 
           <GenerateCommandPalette
