@@ -10,6 +10,6 @@ TOC Sim is a web application designed to help Computer Science students visualiz
 
 * **Interactive Canvas:** Draw states and transitions seamlessly using a drag-and-drop node-based interface.
 * **Real-Time Simulation:** Test strings against your custom automata with step-by-step visual playback. Watch the machine traverse states in real-time.
-* **AI Tutor Integration:** Powered by Google Gemini, the built-in AI tutor can explain the language accepted by your machine, generate complete automata structures from natural language prompts, and debug rejected strings.
+* **AI Tutor Integration:** Powered by Google Gemini (i'm thinking if I will switch to Gemma 4), the built-in AI tutor can explain the language accepted by your machine, generate complete automata structures from natural language prompts, and debug rejected strings.
 * **Instant Feedback:** Clear visual indicators for accepted/rejected states and validation errors for invalid DFA configurations.
 
