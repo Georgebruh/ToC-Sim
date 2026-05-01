@@ -6,3 +6,4 @@ export { GenerateCommandPalette } from './GenerateCommandPalette';
 export { RightSidebar } from './RightSidebar';
 export { BottomNavBar } from './BottomNavBar';
 export { DebugToast } from './DebugToast';
+export { AITutorSidebar } from './AITutorSidebar';
