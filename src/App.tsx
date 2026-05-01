@@ -7,6 +7,7 @@ import {
   RightSidebar,
   BottomNavBar,
   DebugToast,
+  AITutorSidebar,
   type CanvasHandle,
 } from './components';
 import { useSimulationState } from './hooks/useSimulationState';
@@ -60,6 +61,12 @@ export default function App() {
             handleRef={canvasHandleRef}
             activeStateIds={sim.activeStateIds}
             onAutomatonChange={setAutomaton}
+          />
+
+          <AITutorSidebar
+            isOpen={isExplainActive}
+            onClose={() => handleExplainClick()}
+            automaton={sim.automaton}
           />
 
           <GenerateCommandPalette
